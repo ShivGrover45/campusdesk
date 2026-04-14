@@ -1,0 +1,20 @@
+{
+  "name": "campusdesk",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/ShivGrover45/campusdesk#readme",
+  "bugs": {
+    "url": "https://github.com/ShivGrover45/campusdesk/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShivGrover45/campusdesk.git"
+  },
+  "license": "MIT",
+  "author": "Shiv Grover",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
