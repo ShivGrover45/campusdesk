@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+}
+
+enum SubjectType {
+  THEORY
+  LAB
+  PROJECT
+  INTERNSHIP
+}
+
+model Department {
+  id             String    @id @default(uuid())
+  name           String
+  code           String    @unique
+  totalSemesters Int       @default(8)
+  students       Student[]
+  subjects       Subject[]
+  createdAt      DateTime  @default(now())
+}
+
+model User {
+  id                 String   @id @default(uuid())
+  name               String
+  collegeId          String   @unique
+  email              String   @unique
+  passwordHash       String
+  role               Role     @default(STUDENT)
+  mustChangePassword Boolean  @default(true)
+  student            Student?
+  notices            Notice[]
+  createdAt          DateTime @default(now())
+}
+
+model Student {
+  id              String     @id @default(uuid())
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String     @unique
+  department      Department @relation(fields: [departmentId], references: [id])
+  departmentId    String
+  currentSemester Int        @default(1)
+  results         Result[]
+}
+
+model Subject {
+  id              String          @id @default(uuid())
+  name            String
+  code            String          @unique
+  department      Department      @relation(fields: [departmentId], references: [id])
+  departmentId    String
+  semester        Int
+  credits         Int
+  type            SubjectType     @default(THEORY)
+  results         Result[]
+  gradeBoundaries GradeBoundary[]
+  createdAt       DateTime        @default(now())
+}
+
+model GradeBoundary {
+  id           String   @id @default(uuid())
+  subject      Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subjectId    String
+  academicYear String
+  semester     Int
+  grade        String
+  lowestMark   Float
+  highestMark  Float
+  createdAt    DateTime @default(now())
+
+  @@unique([subjectId, academicYear, semester, grade])
+}
+
+model Result {
+  id           String   @id @default(uuid())
+  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId    String
+  subject      Subject  @relation(fields: [subjectId], references: [id])
+  subjectId    String
+  marks        Float
+  grade        String
+  gradePoint   Float
+  isBackPaper  Boolean  @default(false)
+  semester     Int
+  academicYear String
+  createdAt    DateTime @default(now())
+
+  @@unique([studentId, subjectId, academicYear])
+}
+
+model Notice {
+  id          String   @id @default(uuid())
+  title       String
+  body        String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdById String
+  createdAt   DateTime @default(now())
+}
